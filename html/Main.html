@@ -3,8 +3,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript" src="../lib/handlebars.js"></script>
   
-  <script type="text/javascript" src="../../lib/ZohoEmbededAppSDK.min.js"></script> 
-  <script type="text/javascript" src="../../js/handler.js"></script> 
+  <script type="text/javascript" src="../lib/ZohoEmbededAppSDK.min.js"></script> 
+  <script type="text/javascript" src="../js/handler.js"></script> 
+  <script type="text/javascript" src="../js/apiHelper.js"></script> 
   <link rel="stylesheet" type="text/css" href="../css/style.css" />
 
 <script>
@@ -20,8 +21,8 @@ $(document).ready(function()
             <tbody>
                 <tr>
                 	<th width="1%">&nbsp;</th>
-                    <th width="17%">Name</th>
-                    <th width="15%">Required</th>
+                    <th width="17%">Item</th>
+                    <th width="15%">Qty</th>
                     <th width="15%">In Demand</th>
                     <th width="13%">In Stock</th>
                     <th width="15%">Ordered</th>
@@ -34,26 +35,26 @@ $(document).ready(function()
 		                	<td class="index" >{{inc @index}}</td>
 		                    <td class="itemName" >{{LineItem.Name}}</td>
 		                    <td class="itemCount" >{{LineItem.NewQuantity}}</td>
-		                    <td class="itemDemand">{{CrmData.Qty_in_Demand}}</td>
+		                    <td class="itemDemand">{{Stats.stockInDemand}}</td>
 		                    <td class="itemStock">
-		                    	{{#if DeskData.stock_on_hand}}
-		                    		{{DeskData.stock_on_hand}}
+		                    	{{#if Stats.stockInHand}}
+		                    		{{Stats.stockInHand}}
 	                    		{{else}}
-									--
+									Not Avail in Books
 		                    	{{/if}}
 		                    </td>
-		                    <td class="itemSurpless">{{CrmData.Qty_Ordered}}</td>
-   		                    <td class="itemSurpless">{{Calculation.adjusment}}</td>
+		                    <td class="itemSurpless">{{Stats.stockOrdered}}</td>
+   		                    <td class="itemSurpless">{{Stats.adjusment}}</td>
 
 		                </tr>
                 {{/each}}
 			</tbody>
 	</table>
-	{{#isPurchaseRequired this.data}}
-		<input type="button" onclick="widget.ShowPurchaseOrder()" value="Place Purchase Order" class="grnBtn mL15 mT20"></input>
+	{{#if this.purchaseRequired}}
+		<input type="button" onclick="Utils.ShowPurchaseOrder()" value="Place Purchase Order" class="grnBtn mL15 mT20"></input>
 		{{else}}
 		<input type="button" onclick="Utils.closePopUp()" value="Proceed" class="grnBtn mL15 mT20"></input>
-	{{/isPurchaseRequired}}
+	{{/if}}
 
 </div>
 <div class="purchaseOrderCreation" style="display:none">
@@ -100,7 +101,7 @@ $(document).ready(function()
 	                    		name="{{LineItem.ID}}"
 	                    		class="selProducts"
 
-	                    		{{#if isPurchaseRequired}}
+	                    		{{#if Stats.isPurchaseRequired}}
 	                    			checked
 	                    		{{/if}}
 
@@ -109,7 +110,7 @@ $(document).ready(function()
 	                    <td class="itemName">{{LineItem.Name}}</td>
 	                    <td class="itemSurpless">{{Calculation.purchase}}</td>
 	                    <td class="itemQuantity">
-	                    	<input id="{{LineItem.ID}}_Qty" type="number" value="{{Calculation.purchase}}" class="numberField f14"/>
+	                    	<input id="{{LineItem.ID}}_Qty" type="number" value="{{Stats.purchase}}" class="numberField f14"/>
 	                    </td>
 		                    
 
@@ -117,7 +118,7 @@ $(document).ready(function()
             {{/each}}
 		</tbody>
 </table>
-	<input type="button" onclick="widget.createPurchaseOrder()" value="Create" class="grnBtn mL15"></input>
+	<input type="button" onclick="APIHelper.createPurchaseOrder()" value="Create" class="grnBtn mL15"></input>
 </div>
 
 
