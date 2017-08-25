@@ -11,8 +11,8 @@ APIHelper = (function()
 		return temp;
 	}
 	var statusToCheck = {
-			PurchaseOrder : "billed",
-			SalesOrder : "open",
+			PurchaseOrder : ["draft","open"],
+			SalesOrder : ["draft","open"],
 	}
 
 	return {
@@ -147,8 +147,7 @@ APIHelper = (function()
 			if(allData.POLists && allData.POLists.length > 0 ){
 
 				jQuery.each(allData.POLists,function(index,obj){
-
-					if(obj && obj.status === statusToCheck.PurchaseOrder){
+					if(obj && statusToCheck.PurchaseOrder.indexOf(obj.status) >= 0){
 						stockOrdered += obj.item_quantity
 					}
 				});
@@ -160,14 +159,14 @@ APIHelper = (function()
 			var stockInDemand = 0;
 			if(allData.SOLists && allData.SOLists.length > 0 ){
 
-				jQuery.each(allData.POLists,function(index,obj){
+				jQuery.each(allData.SOLists,function(index,obj){
 
-					if(obj && obj.status === statusToCheck.SalesOrder){
+					if(obj && statusToCheck.SalesOrder.indexOf(obj.status) >= 0 ){
 						stockInDemand += obj.item_quantity
 					}
 				});
 			}
-			var qtyRequired =allData.LineItem.NewQuantity
+			var qtyRequired =parseInt(allData.LineItem.NewQuantity);
 			var adjusment = (stockInHand+stockOrdered) - (stockInDemand+qtyRequired);
 			allData.Stats = {
 					stockInHand : stockInHand,
@@ -188,7 +187,9 @@ APIHelper = (function()
 			})
 		},
 		createPurchaseOrder : function(){
-
+			
+			Utils.showLoading();
+			
 			var sub = $("#POSubject").val();
 			var vendor = $("#POVendor").val();
 
@@ -219,6 +220,17 @@ APIHelper = (function()
 					Handler.widgetInit(widgetLoadData);
 				}
 			});
+		},
+		addLineItem : function(json){			
+			var data = {
+					$data:{},
+					$lineItems:[json]
+			}
+			console.log(json);
+			ZOHO.CRM.UI.Record.populate(data)
+			.then(function(){
+				Utils.closePopUp();
+			});
 		}
 	}
-		})()
+})()

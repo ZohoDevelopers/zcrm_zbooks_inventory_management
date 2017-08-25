@@ -1,0 +1,64 @@
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="../lib/handlebars.js"></script>
+  
+  <script type="text/javascript" src="../lib/ZohoEmbededAppSDK.min.js"></script> 
+  <script type="text/javascript" src="../js/handler.js"></script> 
+  <script type="text/javascript" src="../js/apiHelper.js"></script> 
+  <link rel="stylesheet" type="text/css" href="../css/style.css" />
+
+  <link rel="stylesheet" href="../lib/jquery-ui-1.12.1.css">
+  <script src="../lib/jquery-ui-1.12.1.js"></script>
+<script>
+$(document).ready(function()
+{
+	ZOHO.embeddedApp.init()
+	.then(function(){
+		ZOHO.CRM.UI.Resize(1000,1000);
+		Utils.initiateProductAutoComplete($("#ProductName"));
+	});
+});
+</script> 
+</head>
+<body>
+	<div id ="contentDiv">
+	<div class="reportTab">
+    <table cellpadding="0" cellspacing="0" width="97%" class="fil-list" style="margin-top: 25px;">
+            <tbody>
+                <tr>
+                    <th width="70%">Item</th>
+                    <th width="15%">Qty</th>
+                    <th width="15%">Price</th>
+                    
+                </tr>
+                <tr><td colspan="7" style="padding: 0px;margin: 0px;height: 2px;" height="1px"></td></tr>
+		                <tr class="item">
+		                    <td class="itemName" >
+		                    	<input type="text" placeholder="Product" class="txtField f14 prdInfo" name="PRODUCTNAME" id="ProductName"/>
+		                    	<input type="hidden" name="PRODUCTID"  class="prdInfo"/>
+		                    	<input type="hidden" name="PRODUCTCODE"  class="prdInfo"/>
+		                    	<input type="hidden" name="ISTAXABLE"  class="prdInfo"/>
+		                    	<input type="hidden" name="QUANTITY_IN_DEMAND"  class="prdInfo"/>
+		                    	<input type="hidden" name="QUANTITY_IN_STOCK"  class="prdInfo"/>
+		                    	<input type="hidden" name="USAGE_UNIT"  class="prdInfo"/>
+		                    	<input type="hidden" name="VENDORID"  class="prdInfo"/>                	
+		                    </td>
+		                    <td class="itemQty" >
+		                    	<input type="number" class="txtField f14 prdInfo" name="QUANTITY" value="0"/>
+		                    </td>
+		                    <td class="itemPrice">
+		                    	<select name="UNITPRICE" id="ProductPrice" class="prdInfo">
+		                    		<option>0</option>
+		                    	</select>
+		                    </td>
+
+		                </tr>
+			</tbody>
+	</table>
+		<input type="button" onclick="Handler.addLineItem()" value="Add LineItem" class="grnBtn mL15 mT20"></input>
+</div>
+	</div>
+	<div class="modal"></div>
+</body>
+</html>

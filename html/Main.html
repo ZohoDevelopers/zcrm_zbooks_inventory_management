@@ -8,11 +8,16 @@
   <script type="text/javascript" src="../js/apiHelper.js"></script> 
   <link rel="stylesheet" type="text/css" href="../css/style.css" />
 
+  <link rel="stylesheet" href="../lib/jquery-ui-1.12.1.css">
+  <script src="../lib/jquery-ui-1.12.1.js"></script>
 <script>
 $(document).ready(function()
 {
-	ZOHO.embeddedApp.on("PageLoad",Handler.widgetInit)
-	ZOHO.embeddedApp.init();
+	ZOHO.embeddedApp.on("PageLoad",Handler.initReport)
+	ZOHO.embeddedApp.init()
+	.then(function(){
+		ZOHO.CRM.UI.Resize(1000,1000);
+	});
 });
 </script> 
 <script id='stockReport' type='text/x-handlebars-template'>
@@ -71,11 +76,12 @@ $(document).ready(function()
 				<td>
 			</tr>
 			<tr>
-				<td style="padding-bottom:2px;">Vendor : <span style="color: #000 !important;">{{this.vendor.name}}<span></td>
+				<td style="padding-bottom:2px;">Vendor</td>
 			</tr>
 			<tr>
 				<td style="padding-top:2px;">
-					<input type="text" placeholder="Vendor" class="txtField f14" name="vendor" id="POVendor" value="{{this.vendor.id}}"/>
+					<input type="text" placeholder="Vendor" class="txtField f14" name="vendor" id="POVendorSelection" value="{{this.vendor.name}}"/>
+					<input type="hidden" name="vendor" id="POVendor" value="{{this.vendor.id}}"/>
 				<td>
 			</tr>			
 			<tr>
@@ -120,14 +126,11 @@ $(document).ready(function()
 </table>
 	<input type="button" onclick="APIHelper.createPurchaseOrder()" value="Create" class="grnBtn mL15"></input>
 </div>
-
-
 </script>
-
-
 </head>
 <body>
 	<div id ="contentDiv">
 	</div>
+	<div class="modal"></div>
 </body>
 </html>
