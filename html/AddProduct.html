@@ -27,9 +27,9 @@ $(document).ready(function()
     <table cellpadding="0" cellspacing="0" width="97%" class="fil-list" style="margin-top: 25px;">
             <tbody>
                 <tr>
-                    <th width="70%">Item</th>
+                    <th width="60%">Item</th>
                     <th width="15%">Qty</th>
-                    <th width="15%">Price</th>
+                    <th width="25%">Price</th>
                     
                 </tr>
                 <tr><td colspan="7" style="padding: 0px;margin: 0px;height: 2px;" height="1px"></td></tr>
@@ -47,8 +47,10 @@ $(document).ready(function()
 		                    <td class="itemQty" >
 		                    	<input type="number" class="txtField f14 prdInfo" name="QUANTITY" value="0"/>
 		                    </td>
+
 		                    <td class="itemPrice">
-		                    	<select name="UNITPRICE" id="ProductPrice" class="prdInfo">
+		                    	<input id="ProductPrice" type="number" class="txtField f14 prdInfo" name="UNITPRICE" value="0" style="width: 40%;"/>
+		                    	<select name="UNITPRICE_DROP_DOWN" id="prdPriceDropDown" class="prdInfo" onchange="Utils.fillPrice()">
 		                    		<option>0</option>
 		                    	</select>
 		                    </td>
@@ -56,7 +58,7 @@ $(document).ready(function()
 		                </tr>
 			</tbody>
 	</table>
-		<input type="button" onclick="Handler.addLineItem()" value="Add LineItem" class="grnBtn mL15 mT20"></input>
+		<input type="button" onclick="Handler.addLineItem($('.item')[0],true)" value="Add LineItem" class="grnBtn mL15 mT20"></input>
 </div>
 	</div>
 	<div class="modal"></div>

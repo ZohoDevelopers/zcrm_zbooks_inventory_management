@@ -11,8 +11,8 @@ APIHelper = (function()
 		return temp;
 	}
 	var statusToCheck = {
-			PurchaseOrder : ["draft","open"],
-			SalesOrder : ["draft","open"],
+			PurchaseOrder : ["draft","open","partially_billed"],
+			SalesOrder : ["draft","open","partially_billed"],
 	}
 
 	return {
@@ -227,10 +227,7 @@ APIHelper = (function()
 					$lineItems:[json]
 			}
 			console.log(json);
-			ZOHO.CRM.UI.Record.populate(data)
-			.then(function(){
-				Utils.closePopUp();
-			});
+			return ZOHO.CRM.UI.Record.populate(data)
 		}
 	}
 })()

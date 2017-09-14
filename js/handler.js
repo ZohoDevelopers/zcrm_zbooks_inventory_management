@@ -11,7 +11,15 @@ Handlebars.registerHelper("inc", function(value, options)
 {
     return parseInt(value) + 1;
 });
-
+Handlebars.registerHelper('json', function(context) {
+    return JSON.stringify(context);
+});
+Handlebars.registerHelper('log', function(context) {
+    return console.log(context);
+});
+Handlebars.registerHelper('parseInt', function(context) {
+    return parseInt(context);
+});
 /*
  * util methods
  */
@@ -54,8 +62,8 @@ Utils.genHtml=function(templateId,data,callBack){
 Utils.closePopUp = function(){
 	ZOHO.CRM.UI.Popup.close()
 };
-Utils.initiateAutoComplete = function(obj){
-	console.log(obj)
+Utils.initiateVendorAutoComplete = function(obj,callBack){
+		var closureCallBack = callBack;
 		obj.autocomplete({
 			delay: 500,
 			minLength: 1,
@@ -96,7 +104,6 @@ Utils.initiateAutoComplete = function(obj){
 		  	},
 		  	select:function( event, selectedVal)
 		  	{
-		  		console.log()
 		  		event.preventDefault()
 		  		if(selectedVal && selectedVal.item)
 		  		{
@@ -108,6 +115,10 @@ Utils.initiateAutoComplete = function(obj){
 		  			$(event.target).val(label);
 		  			$("#POVendor").val(obj.id);
 		  		}
+		  		if(closureCallBack && typeof closureCallBack === "function"){
+		  			closureCallBack();
+		  		}
+		  		
 		  	}
 		});	
 }
@@ -115,7 +126,7 @@ Utils.initiateAutoComplete = function(obj){
 Utils.ShowPurchaseOrder = function(){
 	$(".reportTab").hide();
 	$(".purchaseOrderCreation").show();
-	Utils.initiateAutoComplete($("#POVendorSelection"));
+	Utils.initiateVendorAutoComplete($("#POVendorSelection"));
 }
 
 /*
@@ -156,7 +167,6 @@ Handler.initReport = function(data)
       	}
 	})
 	.then(function(data){
-		console.log(data);
 		Utils.RenderTemplate("stockReport",data,Utils.hideLoading);
 		
 	})
@@ -169,18 +179,31 @@ Handler.initReport = function(data)
 	});
 	
 }
-Handler.addLineItem = function()
+Handler.addLineItem = function(productRow,closeWidget)
 {
 	var json = {};
-	$(".prdInfo").each(function(index,obj){
+	var productInfoList = undefined;
+	if(productRow){
+		productInfoList = $(productRow).find(".prdInfo")
+	}
+	else{
+		productInfoList = $(".prdInfo")
+	}
+	productInfoList.each(function(index,obj){
 		var name = $(obj).attr("name");
 		var val = $(obj).val();
 		json[name] = val;
 	});
-	APIHelper.addLineItem(json);
+	var promise = APIHelper.addLineItem(json);
+	if(closeWidget){
+		promise
+		.then(function(){
+				Utils.closePopUp();
+		});
+	}
+	
 }
 Utils.initiateProductAutoComplete = function(obj){
-	console.log(obj)
 		obj.autocomplete({
 			delay: 500,
 			minLength: 1,
@@ -224,7 +247,6 @@ Utils.initiateProductAutoComplete = function(obj){
 		  		event.preventDefault()
 		  		if(selectedVal && selectedVal.item)
 		  		{
-		  			console.log(selectedVal.item.value);
 		  			var rd = selectedVal.item.value;
 		  			$("input[name='PRODUCTNAME']").val(rd.Product_Name);
 		  			$("input[name='PRODUCTID']").val(rd.id);
@@ -234,17 +256,52 @@ Utils.initiateProductAutoComplete = function(obj){
 		  			$("input[name='QUANTITY_IN_STOCK']").val(rd.Qty_in_Stock);
 		  			$("input[name='USAGE_UNIT']").val(rd.Usage_Unit);
 		  			$("input[name='VENDORID']").val( rd.Vendor_Name ? rd.Vendor_Name.id  : "");
-		  			
+					
+					$("input[name='UNITPRICE']").val(0);
+
+
 		  			var optionsTag = "";
-		  			$("select[name='UNITPRICE']").find("option").remove()
+		  			$("select[name='UNITPRICE_DROP_DOWN']").find("option").remove()
 		  			Utils.cons.priceFields.forEach(function(obj){
-		  			   $("select[name='UNITPRICE']").append($('<option>', { 
-		  			        value: rd[obj],
-		  			        text : rd[obj] 
-		  			    }));
+		  				if(rd[obj]!=null && !isNaN(rd[obj])){
+		  					$("select[name='UNITPRICE_DROP_DOWN']").append($('<option>', { 
+		  			        	value: rd[obj],
+		  			        	text : rd[obj] 
+		  			    	}));
+		  				}
+		  			   
 		  			});
+
+					$("input[name='UNITPRICE']").val($("select[name='UNITPRICE_DROP_DOWN']").val());
 		  			
 		  		}
 		  	}
 		});	
+}
+Utils.fillPrice=function(obj){
+	$("input[name='UNITPRICE']").val($("select[name='UNITPRICE_DROP_DOWN']").val());
+};
+Utils.ListAllProducts=function(){
+	Utils.showLoading();
+	var vendorID = $("#POVendor").val();
+	ZOHO.CRM.API.getRelatedRecords({
+		Entity:"Vendors",
+		RecordID:vendorID,
+		RelatedList:"Products"
+	}).then(function(data){
+		Utils.RenderTemplate("VendorsProducts",data,Utils.hideLoading);
+	});
+}
+Utils.selectAllPOChkBox=function(obj){
+	var status = $(obj).prop('checked');
+	$(".selectProductForPO").each(function(index,obj){
+		$(obj).attr('checked', status);
+	});
+}
+Utils.addAllProductsAsLineItems = function(){	
+	$(".productRow").each(function(index,obj){
+		var toClose = false;
+		Handler.addLineItem(obj);
+	});
+	Utils.closePopUp();
 }
