@@ -20,7 +20,7 @@ APIHelper = (function()
 		{
 			if(onLoadData && onLoadData.LineItems && onLoadData.LineItems.length > 0)
 			{
-				return ZOHO.CRM.CONFIG.getOrgVariable(Utils.cons.authKeyField)
+				return ZOHO.CRM.API.getOrgVariable(Utils.cons.authKeyField)
 				.then(function(data){
 					booksApiKey = data.Success.Content;
 					widgetLoadData = onLoadData;
@@ -35,9 +35,16 @@ APIHelper = (function()
 		getProductFromCRM : function(context)
 		{
 			return ZOHO.CRM.API.getRecord({Entity:"Products",RecordID:context.LineItem.ID})
-			.then(function(data){
+			.then(function(data)
+			{
+				var productInfo = {};
+				if(data && data.data && data.data instanceof Array)
+				{
+					productInfo = data.data[0];
+				}
 				context.ProdInfo = data;
-				return context;
+				return context;	
+				
 			});
 
 		},
@@ -226,7 +233,6 @@ APIHelper = (function()
 					$data:{},
 					$lineItems:[json]
 			}
-			console.log(json);
 			return ZOHO.CRM.UI.Record.populate(data)
 		}
 	}

@@ -15,7 +15,7 @@ $(document).ready(function()
 {
 	ZOHO.embeddedApp.init()
 	.then(function(){
-		ZOHO.CRM.UI.Resize(1000,1000);
+		ZOHO.CRM.UI.Resize({width:1000,height:1000});
 		Utils.initiateProductAutoComplete($("#ProductName"));
 	});
 });
@@ -27,9 +27,10 @@ $(document).ready(function()
     <table cellpadding="0" cellspacing="0" width="97%" class="fil-list" style="margin-top: 25px;">
             <tbody>
                 <tr>
-                    <th width="60%">Item</th>
+                    <th width="50%">Item</th>
                     <th width="15%">Qty</th>
                     <th width="25%">Price</th>
+                    <th width="10%">Magic Number</th>
                     
                 </tr>
                 <tr><td colspan="7" style="padding: 0px;margin: 0px;height: 2px;" height="1px"></td></tr>
@@ -54,7 +55,9 @@ $(document).ready(function()
 		                    		<option>0</option>
 		                    	</select>
 		                    </td>
-
+		                    <td class="MagicNumber">
+		                    	<span id="ProductMagicNumber"></span>
+		                    </td>
 		                </tr>
 			</tbody>
 	</table>

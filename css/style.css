@@ -329,3 +329,37 @@ select#prdPriceDropDown{
    white-space: nowrap;
    width: 80px;
 }
+
+.navigationDisabled
+{
+    opacity: .2;
+    cursor: auto;
+    pointer-events:none;
+}
+
+.next,.previous{
+    width: 16px!important;
+    height: 16px!important;
+    margin: 0 4px!important;
+    cursor: pointer;
+    border: 0px;
+    outline: none;
+}
+
+.next{
+    background: url(../img/allIcons.svg) no-repeat -42px -19px;
+    width: 11px!important;
+    height: 21px!important;
+}
+
+.previous{
+    background: url(../img/allIcons.svg) no-repeat -13px -19px;
+    width: 11px!important;
+    height: 21px!important;
+}
+
+.rangeTxt{
+    vertical-align: top;
+    margin-top: 4px;
+    display: inline-block;
+}

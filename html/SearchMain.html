@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>autocomplete demo</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="../lib/handlebars.js"></script>
+  
+  <script type="text/javascript" src="../lib/ZohoEmbededAppSDK.min.js"></script> 
+  <script type="text/javascript" src="../js/handler.js"></script> 
+  <script type="text/javascript" src="../js/apiHelper.js"></script> 
+  <link rel="stylesheet" type="text/css" href="../css/style.css" />
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+ 
+<label for="autocomplete">Select a programming language: </label>
+<input id="autocomplete">
+<script>
+$(document).ready(function()
+{
+	ZOHO.embeddedApp.init();
+	var searchResult = [];
+});
+$( "#autocomplete" ).autocomplete({
+	delay: 500,
+	minLength: 1,
+  	source: function(request,callBack){
+  		
+  		ZOHO.CRM.API.searchRecord({
+  			Entity:"Vendors",
+  			Type:"criteria",
+  			Query:"(Vendor_Name:starts_with:"+request.term+")"
+  		}).then(function(data)
+  		{
+  		   if(data && data.data && data.data)
+  		   {	
+	  			searchResult = data.data;
+	  			var resultArr = [];
+	  			data.data.forEach(function(obj){
+  				  resultArr.push(obj['Vendor_Name']);
+  			   });
+  		   }
+  			callBack(resultArr);
+  		});
+  	}
+});
+</script>
+ 
+</body>
+</html>

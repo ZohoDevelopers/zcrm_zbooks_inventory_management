@@ -16,7 +16,7 @@ $(document).ready(function()
 	ZOHO.embeddedApp.on("PageLoad",Handler.initReport)
 	ZOHO.embeddedApp.init()
 	.then(function(){
-		ZOHO.CRM.UI.Resize(1000,1000);
+		ZOHO.CRM.UI.Resize({width:1000,height:1000});
 	});
 });
 </script> 

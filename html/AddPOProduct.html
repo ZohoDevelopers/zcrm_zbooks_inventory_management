@@ -13,12 +13,9 @@
 <script>
 $(document).ready(function()
 {
-	ZOHO.embeddedApp.on("PageLoad",function(data){
-		console.log(data);
-	})
 	ZOHO.embeddedApp.init()
 	.then(function(){
-		ZOHO.CRM.UI.Resize(1000,1000);
+		ZOHO.CRM.UI.Resize({width:1000,height:1000});
 		Utils.initiateVendorAutoComplete($("#POVendorSelection"),Utils.ListAllProducts);
 	});
 });
@@ -30,6 +27,7 @@ $(document).ready(function()
 	<div style="color: #7d7d7d;" class="pB10 f20">Select Vendor</div>
 	<input type="text" placeholder="Vendor" class="txtField f14 ui-autocomplete-input" name="vendor" id="POVendorSelection" autocomplete="off" style="width:50%;">
 	<input type="hidden" name="vendor" id="POVendor" value="">	
+	<input type="hidden" name="vendor" id="POPageNumber" value="0">	
 	<div id ="contentDiv">
 	</div>
 	<div class="modal"></div>
@@ -37,47 +35,112 @@ $(document).ready(function()
 
 
 <script id='VendorsProducts' type='text/x-handlebars-template'>
-    <table cellpadding="0" cellspacing="0" width="97%" class="fil-list" style="margin-top: 25px;">
-            <tbody>
-                <tr>
-                	<th width="1%"><input id="allChkBoxControl" type="checkbox" onchange="Utils.selectAllPOChkBox(this)" checked></th>
-                    <th width="60%">Item</th>
-                    <th width="15%">Qty</th>
-                    <th width="25%">Cost Price</th>
-                </tr>
-                <tr><td colspan="7" style="padding: 0px;margin: 0px;height: 2px;" height="1px"></td></tr>
-                {{#each this}}
-		                <tr class="item productRow">
-							<td class="index" ><input class="selectProductForPO" type="checkbox" checked></td>
-		                    <td class="itemName" >
-		                    	<span class="f14"/>
-		                    		
-		                    		<span>{{Product_Name}}</span>
-		                    		<span style="color:#afafaf;">( {{Product_Code}} )</span>
+	{{#if this.data}}
+	    <table cellpadding="0" cellspacing="0" width="97%" class="fil-list" style="margin-top: 25px;">
+	            <tbody>
+	            	<tr>
+	            		<td colspan="2">
+							<input type="button" onclick="Utils.addAllProductsAsLineItems()" value="Add LineItems" class="grnBtn">
+						</td>
+	            		<td></td>
+	            		<td></td>
+	            		<td>
+	            			<input 
+	            				type="button" 
+	            				class="next {{#compare this.info.more_records false}}navigationDisabled{{/compare}}" 
+	            				style="float:right"
+	            				border="0"
+	            				data-pageToRequest="{{math this.info.page '+' 1}}"
+	            				onclick="Utils.PaginateProductList(this)"
+	            			>
+							<span 
+								class="rangeTxt"
+								style="float:right"
+							>{{getIndices this.info.page this.info.per_page this.info.count}}
+							</span>
+	            			<input 
+	            				type="button" 
+	            				class="previous {{#compare this.info.page 1}}navigationDisabled{{/compare}}" 
+	            				style="float:right"
+	            				border="0"
+	            				data-pageToRequest="{{math this.info.page '-' 1}}"
+	            				onclick="Utils.PaginateProductList(this)"
+	            			>
+	            		</td>
+	            	</tr>
+	                <tr>
+	                	<th width="1%"><input id="allChkBoxControl" type="checkbox" onchange="Utils.selectAllPOChkBox(this)" checked></th>
+	                    <th width="50%">Item</th>
+	                    <th width="15%">Qty</th>
+	                    <th width="20%">Cost Price</th>
+	                    <th width="15%">Magic Number</th>
+	                </tr>
+	                <tr><td colspan="7" style="padding: 0px;margin: 0px;height: 2px;" height="1px"></td></tr>
+	                {{#each this.data}}
+			                <tr class="item productRow">
+								<td class="index" ><input class="selectProductForPO" type="checkbox" checked></td>
+			                    <td class="itemName" >
+			                    	<span class="f14"/>
+			                    		
+			                    		<span>{{Product_Name}}</span>
+			                    		<span style="color:#afafaf;">( {{Product_Code}} )</span>
 
-		                    	</span>
-		                    	<input type="hidden" placeholder="Product" class="txtField f14 prdInfo" name="PRODUCTNAME" id="ProductName" value="{{Product_Name}}"/>
-		                    	<input type="hidden" name="PRODUCTID"  class="prdInfo" value="{{id}}"/>
-		                    	<input type="hidden" name="PRODUCTCODE"  class="prdInfo" value="{{Product_Code}}"/>
-		                    	<input type="hidden" name="ISTAXABLE"  class="prdInfo" value="{{Taxable}}"/>
-		                    	<input type="hidden" name="QUANTITY_IN_DEMAND"  class="prdInfo" value="{{Qty_in_Demand}}"/>
-		                    	<input type="hidden" name="QUANTITY_IN_STOCK"  class="prdInfo" value="{{Qty_in_Stock}}"/>
-		                    	<input type="hidden" name="USAGE_UNIT"  class="prdInfo" value="{{Usage_Unit}}"/>
-		                    	<input type="hidden" name="VENDORID"  class="prdInfo" value="{{Vendor_Name.id}}"/>                	
-		                    </td>
-		                    <td class="itemQty" >
-		                    	<input type="number" class="txtField f14 prdInfo" name="QUANTITY" value="{{{parseInt Vendor_QTY}}}"/>
-		                    </td>
+			                    	</span>
+			                    	<input type="hidden" placeholder="Product" class="txtField f14 prdInfo" name="PRODUCTNAME" id="ProductName" value="{{Product_Name}}"/>
+			                    	<input type="hidden" name="PRODUCTID"  class="prdInfo" value="{{id}}"/>
+			                    	<input type="hidden" name="PRODUCTCODE"  class="prdInfo" value="{{Product_Code}}"/>
+			                    	<input type="hidden" name="ISTAXABLE"  class="prdInfo" value="{{Taxable}}"/>
+			                    	<input type="hidden" name="QUANTITY_IN_DEMAND"  class="prdInfo" value="{{Qty_in_Demand}}"/>
+			                    	<input type="hidden" name="QUANTITY_IN_STOCK"  class="prdInfo" value="{{Qty_in_Stock}}"/>
+			                    	<input type="hidden" name="USAGE_UNIT"  class="prdInfo" value="{{Usage_Unit}}"/>
+			                    	<input type="hidden" name="VENDORID"  class="prdInfo" value="{{Vendor_Name.id}}"/>                	
+			                    </td>
+			                    <td class="itemQty" >
+			                    	<input type="number" class="txtField f14 prdInfo" name="QUANTITY" value="{{{parseInt Vendor_QTY}}}"/>
+			                    </td>
 
-		                    <td class="itemPrice">
-		                    	<input id="ProductPrice" type="number" class="txtField f14 prdInfo" name="UNITPRICE" value="{{Cost_Price}}" style="width: 40%;"/>
-		                    </td>
-
-		                </tr>
-                {{/each}}
-                
-			</tbody>
-	</table>
-	<input type="button" onclick="Utils.addAllProductsAsLineItems()" value="Add LineItems" class="grnBtn mL15 mT20"></input>
+			                    <td class="itemPrice">
+			                    	<input id="ProductPrice" type="number" class="txtField f14 prdInfo" name="UNITPRICE" value="{{Cost_Price}}" style="width: 40%;"/>
+			                    </td>
+			                    <td class="magicNumber">
+			                    	<span>{{Magic_Number1}}</span>
+			                    </td>
+			                </tr>
+	                {{/each}}
+	            	<tr>
+	            		<td colspan="2">
+							<input type="button" onclick="Utils.addAllProductsAsLineItems()" value="Add LineItems" class="grnBtn">
+						</td>
+	            		<td></td>
+	            		<td></td>
+	            		<td>
+	            			<input 
+	            				type="button" 
+	            				class="next {{#compare this.info.more_records false}}navigationDisabled{{/compare}}" 
+	            				style="float:right"
+	            				border="0"
+	            				data-pageToRequest="{{math this.info.page '+' 1}}"
+	            				onclick="Utils.PaginateProductList(this)"
+	            			>
+							<span 
+								class="rangeTxt"
+								style="float:right"
+							>{{getIndices this.info.page this.info.per_page this.info.count}}
+							</span>
+	            			<input 
+	            				type="button" 
+	            				class="previous {{#compare this.info.page 1}}navigationDisabled{{/compare}}" 
+	            				style="float:right"
+	            				border="0"
+	            				data-pageToRequest="{{math this.info.page '-' 1}}"
+	            				onclick="Utils.PaginateProductList(this);"
+	            			>
+	            		</td>
+	            	</tr>
+				</tbody>
+		</table>
+	{{else}}
+		No Products available
+	{{/if}}
 </script>
 </html>
